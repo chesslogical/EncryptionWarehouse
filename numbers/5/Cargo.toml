@@ -1,0 +1,16 @@
+[package]
+name = "tf"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+cipher = "0.4"
+hkdf = "0.12"
+hmac = "0.12"
+sha2 = "0.10"
+libc = "0.2"
+threefish = "0.5"
+zeroize = "1.7"
+rand = "0.8"
