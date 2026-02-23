@@ -180,14 +180,3 @@ MIT
 
 ---
 
-If you'd like, I can also:
-
-- Add a more “production-grade” security disclaimer
-- Add threat model documentation
-- Add benchmarking results
-- Make it look more like a polished open-source project page
-- Add badges and CI setup
-
-Just tell me the vibe you're going for:
-Minimalist, serious crypto tool, or polished GitHub project?
-```
