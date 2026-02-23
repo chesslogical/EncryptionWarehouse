@@ -1,4 +1,4 @@
-Absolutely — here’s a clean, professional `README.md` you can drop into your project.
+
 
 ---
 
