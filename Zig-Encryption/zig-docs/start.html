@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zig Error Verbosity & Terminal Tips</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+      line-height: 1.6;
+      background-color: #fdfdfd;
+      color: #333;
+    }
+    code {
+      background-color: #f0f0f0;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+    pre {
+      background-color: #f0f0f0;
+      padding: 1rem;
+      overflow-x: auto;
+      border-radius: 6px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background-color: #eee;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Zig Error Verbosity & Terminal Output Tips</h1>
+
+  <p>
+    Zig shows full error traces by default, which is great for development — but can be a little much in production environments.
+  </p>
+
+  <h2>🤔 Why does Zig show full errors?</h2>
+  <ul>
+    <li>Zig prioritizes <strong>debuggability</strong>.</li>
+    <li>Full traces help pinpoint logic bugs and memory issues fast.</li>
+    <li>Default builds are in <code>Debug</code> mode — very verbose!</li>
+  </ul>
+
+  <h2>💡 How to clean up error output in production</h2>
+
+  <h3>1. Catch and print errors yourself</h3>
+  <pre><code>const result = main() catch |err| {
+    std.debug.print("Error: {}\n", .{err});
+    return;
+};</code></pre>
+
+  <h3>2. Compile with release settings</h3>
+  <pre><code>zig build-exe aes.zig -O ReleaseSafe</code></pre>
+  <p>Use <code>-O ReleaseFast</code> or <code>-O ReleaseSmall</code> for other optimizations.</p>
+
+  <h3>3. Use custom logging instead of full debug traces</h3>
+  <p>You can switch to <code>std.log</code> or your own formatted messages for production tools.</p>
+
+  <h2>🛠️ Build Mode Summary</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Mode</th>
+        <th>Verbosity</th>
+        <th>Usage</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>Debug</code> (default)</td>
+        <td>High (traces)</td>
+        <td>Development & testing</td>
+      </tr>
+      <tr>
+        <td><code>ReleaseSafe</code></td>
+        <td>Lower</td>
+        <td>Production, safety checks on</td>
+      </tr>
+      <tr>
+        <td><code>ReleaseFast</code></td>
+        <td>Minimal</td>
+        <td>Production, optimized performance</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>❓ Why does my terminal show weird characters like "ΓåÆ"?</h2>
+
+  <p>
+    If you see something like <code>ΓåÆ</code> instead of an arrow (→), it's because your terminal doesn't support Unicode output.
+  </p>
+
+  <h3>🔍 Cause</h3>
+  <ul>
+    <li>The arrow symbol <code>→</code> is a Unicode character (U+2192).</li>
+    <li>Older Windows terminals (like Command Prompt) can’t display it correctly in UTF-8 mode.</li>
+    <li>It shows garbage characters (mojibake) instead.</li>
+  </ul>
+
+  <h3>✅ Fixes</h3>
+  <ul>
+    <li>Use ASCII-friendly symbols like <code>-></code> in print statements.</li>
+    <li>Or switch to a terminal that supports UTF-8, such as:
+      <ul>
+        <li>Windows Terminal</li>
+        <li>PowerShell Core</li>
+        <li>Git Bash</li>
+        <li>WSL (Linux shells)</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3>Example</h3>
+  <pre><code>// Bad for Windows CMD
+std.debug.print("Encrypted '{s}' → '{s}'\n", .{in, out});
+
+// Better:
+std.debug.print("Encrypted '{s}' -> '{s}'\n", .{in, out});</code></pre>
+
+  <h2>✅ Takeaway</h2>
+  <p>
+    Use ASCII-friendly output for compatibility, or upgrade your terminal for the full Unicode experience!
+  </p>
+
+</body>
+</html>

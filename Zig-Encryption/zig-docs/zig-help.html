@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zig CLI Help Reference</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+      line-height: 1.6;
+      background-color: #fdfdfd;
+      color: #333;
+    }
+    code, pre {
+      background-color: #f4f4f4;
+      padding: 0.3rem 0.5rem;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+    h2 {
+      margin-top: 2rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+    th, td {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+    }
+    th {
+      background-color: #eee;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📘 Zig CLI Help Reference</h1>
+
+  <p>
+    When you run <code>zig</code> in the terminal with no arguments, you’ll see the full help menu.
+    Here’s what each command and option does.
+  </p>
+
+  <h2>🧰 Zig CLI Commands</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Command</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>build</code></td>
+        <td>Builds a project using a <code>build.zig</code> file (if present). Supports full project pipelines.</td>
+      </tr>
+      <tr>
+        <td><code>build-exe</code></td>
+        <td>Compiles a source file into an executable. Use this for simple tools or scripts.</td>
+      </tr>
+      <tr>
+        <td><code>build-lib</code></td>
+        <td>Compiles a Zig source file into a static or dynamic library.</td>
+      </tr>
+      <tr>
+        <td><code>run</code></td>
+        <td>Compiles and runs a Zig file in one step. Great for quick testing.</td>
+      </tr>
+      <tr>
+        <td><code>test</code></td>
+        <td>Compiles and runs all unit tests in a file.</td>
+      </tr>
+      <tr>
+        <td><code>fmt</code></td>
+        <td>Formats your Zig code (like <code>gofmt</code> or <code>rustfmt</code>).</td>
+      </tr>
+      <tr>
+        <td><code>init-exe</code></td>
+        <td>Creates a new Zig project set up for building executables (with folders and <code>build.zig</code>).</td>
+      </tr>
+      <tr>
+        <td><code>init-lib</code></td>
+        <td>Creates a new Zig library project structure.</td>
+      </tr>
+      <tr>
+        <td><code>translate-c</code></td>
+        <td>Converts C code to Zig syntax (experimental but useful for migration).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>🌐 Global Options</h2>
+
+  <ul>
+    <li><code>--help</code> — Prints the help message</li>
+    <li><code>--version</code> — Prints the installed Zig version</li>
+  </ul>
+
+  <h2>💡 Tip</h2>
+  <p>
+    Use <code>zig run file.zig</code> to quickly test Zig files without creating a build project.
+    For full control, use <code>zig build-exe</code> and <code>zig build</code> with <code>build.zig</code>.
+  </p>
+
+</body>
+</html>

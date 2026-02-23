@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zig Build System Guide</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+      line-height: 1.6;
+    }
+    code, pre {
+      background-color: #f4f4f4;
+      padding: 0.3rem 0.5rem;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+    h2 {
+      margin-top: 2rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+    th, td {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+    }
+    th {
+      background-color: #eee;
+    }
+  </style>
+</head>
+<body>
+
+<h1>📦 Zig Build System Guide</h1>
+
+<p>
+Zig's build system is powerful but optional. This guide helps you decide when you need a <code>build.zig</code> file, and what alternatives you can use for simple apps.
+</p>
+
+<h2>✅ Do You Need <code>build.zig</code>?</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Use Case</th>
+      <th>Need <code>build.zig</code>?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Simple CLI tool (1–3 files)</td>
+      <td>No ❌</td>
+    </tr>
+    <tr>
+      <td>Single-file experiments</td>
+      <td>No ❌</td>
+    </tr>
+    <tr>
+      <td>Multiple build configurations (debug/release)</td>
+      <td>Yes ✅</td>
+    </tr>
+    <tr>
+      <td>Library or package development</td>
+      <td>Yes ✅</td>
+    </tr>
+    <tr>
+      <td>Want to use <code>zig build</code></td>
+      <td>Yes ✅</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>🛠️ Without build.zig: Use <code>zig build-exe</code></h2>
+
+<pre><code>zig build-exe main.zig</code></pre>
+
+- Works for most simple tools
+- Supports imports with relative paths
+- Quick, direct, and scriptable
+
+<h2>📁 With build.zig: Use <code>zig build</code></h2>
+
+<pre><code>zig build</code></pre>
+
+- Uses a programmable Zig file (<code>build.zig</code>) to define builds
+- Supports cross-compilation, release modes, test runners, package config
+
+<h2>📦 Advanced: Add a <code>build.zig.zon</code> for Package Management</h2>
+
+Zig now supports basic package dependencies with `.zon` files. These are similar to Rust's `Cargo.toml` or Go modules.
+
+<h2>✨ Summary</h2>
+
+<p>Zig keeps things simple — no config required unless you want advanced features. Start small, and scale up as your needs grow!</p>
+
+</body>
+</html>
