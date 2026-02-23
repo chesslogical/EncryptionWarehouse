@@ -1,5 +1,0 @@
-would it be possible to do any of this? Refactor CTR into a reusable struct (avoid re-init)
-
-Replace XOR counter layout with clean counter block structure
-Add version byte in header
-Optionally migrate to a misuse-resistant SIV construction
