@@ -1,0 +1,20 @@
+[package]
+name = "filecrypt"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+
+serpent = "0.4"
+cipher = "0.3"
+
+hkdf = "0.12"
+hmac = "0.12"
+sha2 = "0.10"
+
+zeroize = "1.8"
+
+rand = "0.8"
+libc = "0.2"
