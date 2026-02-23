@@ -1,0 +1,11 @@
+[package]
+name = "detkey"
+version = "3.0.0"
+edition = "2021"
+
+[dependencies]
+argon2 = "0.5"
+chacha20 = "0.9"
+clap = { version = "4.4", features = ["derive"] }
+rpassword = "7"
+zeroize = "1"

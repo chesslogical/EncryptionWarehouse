@@ -1,0 +1,13 @@
+[package]
+name = "s1"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+aes-gcm-siv = { version = "0.11", features = ["aes", "alloc"] }
+aead = "0.5"
+rand = { version = "0.8", features = ["getrandom"] }
+tempfile = "3.10"
+anyhow = "1.0"
+sha2 = "0.10"
+zeroize = "1.8"

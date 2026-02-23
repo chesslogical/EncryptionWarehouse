@@ -1,0 +1,9 @@
+[package]
+name = "filecrypt"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sodiumoxide = "0.2.7"
+clap = { version = "4.5", features = ["derive"] }
+anyhow = "1.0"

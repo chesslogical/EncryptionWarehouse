@@ -1,0 +1,21 @@
+[package]
+name = "key"
+version = "1.0.0"
+edition = "2021"
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[dependencies]
+argon2 = "0.5"
+blake3 = "1.5"
+clap = { version = "4.5", features = ["derive"] }
+nix = { version = "0.28", default-features = false, features = ["fs", "resource", "process"] }
+rand = "0.8"
+rand_chacha = "0.3"
+rpassword = "7"
+subtle = "2.5"
+zeroize = "1.7"

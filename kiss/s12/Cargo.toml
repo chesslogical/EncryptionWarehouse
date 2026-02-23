@@ -1,0 +1,22 @@
+[package]
+name = "serpent2"
+version = "0.1.0"
+edition = "2021"
+description = "Simple, reliable, Linux-only file encryptor using Serpent-256 with strong Argon2id"
+authors = ["Your Name <you@example.com>"]
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+anyhow = "1.0"
+argon2 = "0.5"
+cbc = "0.1"
+cipher = "0.4"
+hmac = "0.12"
+hkdf = "0.12"
+rand = "0.8"
+secrecy = "0.8"
+sha2 = "0.10"
+serpent = "0.5.1"
+zeroize = "1.8"          # explicitly added for clarity (though secrecy depends on it)
+rpassword = "7.3"
+num_cpus = "1.16"
