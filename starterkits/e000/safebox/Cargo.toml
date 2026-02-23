@@ -1,0 +1,20 @@
+[package]
+name = "safebox_gui"
+version = "2.2.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1"
+blake3 = "1"
+chacha20poly1305 = "0.10.1"
+filetime = "0.2"
+fs2 = "0.4"
+hex = "0.4"
+rand = "0.8"
+tempfile = "3"
+zeroize = "1"
+
+# GUI
+eframe = { version = "0.27", default-features = true }
+egui = "0.27"
+rfd = "0.14"

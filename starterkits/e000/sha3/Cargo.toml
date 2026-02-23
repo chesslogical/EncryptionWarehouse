@@ -1,0 +1,10 @@
+# Cargo.toml
+[package]
+name = "sha3_gui"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sha3 = "0.10"
+hex = "0.4"
+eframe = "0.32"

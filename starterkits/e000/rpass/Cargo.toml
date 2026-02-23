@@ -1,0 +1,24 @@
+
+
+[package]
+name = "rsafe"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Atomic, data-safe password-based file encrypter/decrypter (XChaCha20-Poly1305 + Argon2id) with in-place atomic replace"
+
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4.5", features = ["derive"] }
+rpassword = "7"
+zeroize = "1.7"
+tempfile = "3"
+fd-lock = "4"
+libsodium-rs = "0.1.0"
+libsodium-sys-stable = { version = "1.22.3" }
+filetime = "0.2"
+indicatif = "0.17"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.52", features = ["Win32_Foundation", "Win32_Storage_FileSystem"] }
