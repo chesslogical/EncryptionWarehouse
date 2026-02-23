@@ -1,0 +1,49 @@
+### Overview of the App's Purpose and Scope
+To create the most secure encryption CLI app in Rust for Linux, we'd start by defining its core function: a tool for symmetric encryption and decryption of files or data streams, using a user-provided password. This keeps it simple yet versatile—think something like encrypting sensitive documents or backups to protect data at rest. We'd avoid overcomplicating it with features like asymmetric crypto, networking, or multi-user support unless absolutely necessary, as each addition introduces potential attack surfaces. The threat model assumes protection against local adversaries (e.g., stolen devices, malware scanning files) and some side-channel risks, but not nation-state level attacks on the crypto primitives themselves. Reliability means it should handle edge cases gracefully (e.g., large files, interrupted operations) without data corruption, and production-grade implies thorough testing, minimal dependencies, and adherence to best practices for maintainability.
+
+Since it's "hand-rolled" (meaning built from scratch rather than forking an existing tool like `age` or `gpg`), the focus is on assembling secure components carefully, not inventing new algorithms. Rolling your own crypto primitives is a cardinal sin—it's insecure and unreliable due to subtle bugs like timing attacks. Instead, we'd leverage audited, battle-tested libraries while ensuring the app's logic is airtight. Rust is ideal here: its ownership model prevents memory leaks and buffer overflows, and its ecosystem supports secure coding patterns out of the box.
+
+### Crypto Primitives and Algorithm Choices
+For encryption, the gold standard would be a authenticated encryption with associated data (AEAD) scheme to ensure confidentiality, integrity, and authenticity. Options like AES-256-GCM or XChaCha20-Poly1305 are top contenders—both are post-quantum resistant in practice (though not formally) and widely recommended by cryptographers. XChaCha20-Poly1305 edges out for "most secure" because its larger nonce size reduces misuse risks (e.g., nonce reuse leading to catastrophic failures), and it's faster on hardware without AES-NI acceleration, which fits Linux's diverse environments. We'd use a 256-bit key for future-proofing against brute-force advances.
+
+Key derivation from passwords would use Argon2id, the memory-hard winner of the Password Hashing Competition. It's resistant to GPU/ASIC attacks, and we'd tune parameters aggressively (e.g., high memory cost like 1 GiB, multiple iterations) to slow down offline brute-force attempts, balanced against usability on typical Linux hardware. Salts would be randomly generated per operation, at least 128 bits from a cryptographically secure pseudo-random number generator (CSPRNG).
+
+To avoid common pitfalls:
+- All operations would be constant-time to mitigate timing attacks.
+- Nonces/IVs would be generated securely and never reused.
+- We'd include a version header in encrypted files for forward compatibility and to detect tampering early.
+
+### Key Management and User Input Security
+Security hinges on keys, so the app would never store them persistently—ephemeral only. Password input would use Linux-specific APIs (e.g., via Rust's standard library or a crate like `rpassword`) to read without echoing to the terminal, preventing shoulder-surfing or log leaks. For added paranoia, we'd support passphrase confirmation to catch typos, and optionally integrate with hardware tokens (e.g., YubiKey via PKCS#11) for two-factor key derivation, though that might require minimal external deps.
+
+To enhance reliability, the app would handle weak passwords gracefully by warning users (e.g., entropy checks) but not enforcing policies, as that's a user education issue. In a production-grade setup, we'd log errors securely (no sensitive data) and provide verbose modes for auditing.
+
+### File and Data Handling
+For encrypting files, the app would stream data in chunks to handle arbitrary sizes without loading everything into memory, preventing DoS on low-RAM systems. We'd use Rust's `std::fs` with careful error propagation to ensure atomic operations—e.g., write to a temp file, then rename on success to avoid partial encrypts. Decryption would verify integrity first, failing fast on corruption.
+
+Security extras:
+- Secure deletion: After operations, optionally overwrite originals with random data (multiple passes) using Linux's `shred`-like logic to thwart forensic recovery.
+- Metadata protection: Strip or encrypt file metadata (timestamps, permissions) to avoid leaking info.
+- Checksums: Pre- and post-encryption hashes (e.g., BLAKE3 for speed and security) to detect accidental changes.
+
+Reliability comes from handling interruptions (e.g., SIGINT) by cleaning up partial files, and supporting resumable operations for very large files via checkpoints.
+
+### Sandboxing and Runtime Security
+To make it "most secure," we'd sandbox the app using Linux features. Rust supports seccomp filters to restrict syscalls (e.g., block network access, limit file ops to specified paths), preventing exploitation if a bug is found. We'd drop privileges early (e.g., via `setuid` if run as root, though CLI apps rarely need that). Memory would be zeroized after use for sensitive data (Rust's `zeroize` trait), and we'd compile with stack canaries, ASLR, and other hardening flags.
+
+For production-grade, the binary would be statically linked (musl libc) for portability across Linux distros, minimizing deps to avoid supply-chain attacks. No external crates beyond essentials (e.g., for Argon2, ChaCha), and those would be pinned to audited versions.
+
+### Testing, Auditing, and Reliability Measures
+Even hand-rolled, production-grade means rigorous validation:
+- Unit/integration tests for all paths, including fuzzing (e.g., via `cargo fuzz`) to simulate bad inputs.
+- Property-based testing to verify crypto invariants (e.g., encrypt-decrypt roundtrips).
+- Formal verification for critical parts, like key derivation, using tools like Kani or Verus in Rust.
+- External audits: Hypothetically, submit to cryptographers or use automated tools like `cargo audit`.
+- Benchmarking for performance reliability, ensuring it scales on servers or embedded Linux.
+
+Edge cases: Handle UTF-8 paths, symlinks securely (no following to avoid traversal attacks), and provide clear error messages without revealing secrets.
+
+### Potential Limitations and Trade-offs
+No app is perfectly secure—quantum computing could break ECC if we added asymmetric features, but we'd stick to symmetric for simplicity. Usability vs. security: High Argon2 params slow it down, so offer configurable profiles. As a CLI, it's inherently more secure than GUI (less attack surface), but users must manage keys responsibly.
+
+This design would rival tools like `rage` (Rust-based age implementation) in security while being custom-tailored. It's reliable through Rust's guarantees and exhaustive testing, making it suitable for production even if hand-rolled.

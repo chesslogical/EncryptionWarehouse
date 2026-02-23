@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>secureapp – Encrypted File Utility</title>
+<style>
+    body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        margin: 40px;
+        max-width: 900px;
+        line-height: 1.6;
+        background: #f8f9fa;
+        color: #222;
+    }
+    h1, h2, h3 {
+        color: #111;
+    }
+    code {
+        background: #eee;
+        padding: 4px 6px;
+        border-radius: 4px;
+        font-size: 0.95em;
+    }
+    pre {
+        background: #111;
+        color: #0f0;
+        padding: 16px;
+        overflow-x: auto;
+        border-radius: 8px;
+    }
+    .section {
+        margin-bottom: 40px;
+    }
+    .warning {
+        background: #fff3cd;
+        padding: 15px;
+        border-left: 6px solid #ffc107;
+        border-radius: 6px;
+    }
+</style>
+</head>
+<body>
+
+<h1>secureapp</h1>
+
+<p>
+<strong>secureapp</strong> is a Linux-focused file encryption tool written in Rust.
+It provides authenticated encryption using:
+</p>
+
+<ul>
+<li>XChaCha20-Poly1305 (AEAD)</li>
+<li>Argon2id password-based key derivation</li>
+<li>HKDF key separation</li>
+<li>Atomic in-place file replacement</li>
+</ul>
+
+<hr>
+
+<div class="section">
+<h2>Build</h2>
+
+<pre><code>cargo build --release</code></pre>
+
+The compiled binary will be located at:
+
+<pre><code>target/release/secureapp</code></pre>
+
+You may copy it locally:
+
+<pre><code>cp target/release/secureapp .</code></pre>
+</div>
+
+<hr>
+
+<div class="section">
+<h2>Basic Usage</h2>
+
+<h3>Encrypt In Place (Recommended)</h3>
+
+<pre><code>./secureapp enc --in-place -i file.txt</code></pre>
+
+This will:
+<ul>
+<li>Prompt for password</li>
+<li>Create a temporary file</li>
+<li>Encrypt contents</li>
+<li>Atomically replace the original file</li>
+</ul>
+
+<h3>Decrypt In Place</h3>
+
+<pre><code>./secureapp dec --in-place -i file.txt</code></pre>
+
+This restores the original plaintext file using atomic replacement.
+</div>
+
+<hr>
+
+<div class="section">
+<h2>Encrypt to Separate Output</h2>
+
+<pre><code>./secureapp enc -i file.txt -o file.sec</code></pre>
+
+<h3>Delete Original After Encryption</h3>
+
+<pre><code>./secureapp enc -i file.txt -o file.sec --delete</code></pre>
+
+This securely overwrites the original file before deleting it.
+</div>
+
+<hr>
+
+<div class="section">
+<h2>Decrypt to Separate Output</h2>
+
+<pre><code>./secureapp dec -i file.sec -o restored.txt</code></pre>
+</div>
+
+<hr>
+
+<div class="section">
+<h2>Adjust Argon2 Security Parameters</h2>
+
+<p>Defaults:</p>
+<ul>
+<li>Memory: 1024 MB</li>
+<li>Iterations: 3</li>
+<li>Parallelism: 4</li>
+</ul>
+
+Example with stronger settings:
+
+<pre><code>./secureapp enc --in-place -i file.txt \
+    --memory 2048 \
+    --iterations 4 \
+    --parallelism 4</code></pre>
+
+Higher memory increases resistance to GPU cracking.
+</div>
+
+<hr>
+
+<div class="section">
+<h2>Security Model</h2>
+
+<ul>
+<li>Authenticated encryption (integrity verified)</li>
+<li>Per-file random salt</li>
+<li>Per-file random nonce base</li>
+<li>Chunked encryption for large files</li>
+<li>Atomic rename to prevent corruption</li>
+<li>Directory fsync for crash safety (Linux)</li>
+</ul>
+
+<p>
+If authentication fails during decryption, the file is not replaced.
+</p>
+</div>
+
+<hr>
+
+<div class="section">
+<h2>Example Workflow</h2>
+
+<pre><code># Encrypt
+./secureapp enc --in-place -i secrets.txt
+
+# File is now encrypted
+
+# Decrypt
+./secureapp dec --in-place -i secrets.txt</code></pre>
+</div>
+
+<hr>
+
+<div class="section warning">
+<strong>Important:</strong>
+<ul>
+<li>If you forget your password, the data is permanently unrecoverable.</li>
+<li>Always test decryption before deleting backups.</li>
+<li>Do not reduce Argon2 memory settings unless necessary.</li>
+</ul>
+</div>
+
+<hr>
+
+<p><em>secureapp — Minimal. Strong. Linux-native.</em></p>
+
+</body>
+</html>
