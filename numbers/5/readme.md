@@ -1,6 +1,4 @@
-Here is a clean, professional `README.md` for your project.
 
-You can copy this directly into `README.md`.
 
 ---
 
