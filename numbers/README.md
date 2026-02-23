@@ -3,3 +3,7 @@
 2- XChaCha20-Poly1305 version of 1. 
 
 3- otp xor transformer and keygen 
+
+4-  Serpent-256 encryption
+
+5- threefish 1024
