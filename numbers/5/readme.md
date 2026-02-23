@@ -176,11 +176,3 @@ Use at your own risk.
 
 ---
 
-If you'd like, I can also provide:
-
-* A hardened, audit-ready README
-* A minimalistic hacker-style README
-* A security-whitepaper-style README
-* Or a GitHub-polished version with badges
-
-Just tell me the vibe you want.
