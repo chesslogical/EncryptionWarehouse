@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Keymaker CLI - README</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin: 2rem;
+        background-color: #ffffff;
+        color: #000000;
+    }
+    h1, h2, h3 {
+        color: #000000;
+    }
+    pre {
+        background: #f4f4f4;
+        color: #000000;
+        padding: 1rem;
+        overflow-x: auto;
+        border-radius: 5px;
+        border: 1px solid #cccccc;
+    }
+    code {
+        background: #eeeeee;
+        padding: 0.2rem 0.4rem;
+        border-radius: 3px;
+    }
+    a {
+        color: #0000ee;
+    }
+</style>
+</head>
+<body>
+
+<h1>Keymaker CLI</h1>
+<p>
+Keymaker is a <strong>no-dependency</strong> Rust CLI tool that generates cryptographically secure random keys of any length in bytes.
+It works on Unix/macOS using <code>/dev/urandom</code> and on Windows via <code>BCryptGenRandom</code>.
+</p>
+
+<h2>Features</h2>
+<ul>
+    <li>No external crates — pure Rust + OS APIs</li>
+    <li>Cryptographically strong randomness</li>
+    <li>Supports <code>hex</code>, <code>base64</code>, and <code>raw</code> output formats</li>
+    <li>Optional uppercase HEX output</li>
+    <li>Optionally save output to a file</li>
+</ul>
+
+<h2>Build Instructions</h2>
+<pre><code># Clone or place main.rs in a new Rust project
+cargo build --release
+</code></pre>
+
+<h2>Usage</h2>
+<pre><code>keymaker &lt;length&gt; [--format hex|base64|raw] [--uppercase] [--out PATH]</code></pre>
+<ul>
+    <li><code>&lt;length&gt;</code> — Number of random bytes to generate (must be &gt; 0)</li>
+    <li><code>--format</code> — Output format (default: hex)</li>
+    <li><code>--uppercase</code> — Use uppercase HEX (only valid with <code>--format hex</code>)</li>
+    <li><code>--out PATH</code> — Write output to a file instead of stdout</li>
+</ul>
+
+<h2>Examples</h2>
+<pre><code># 32-byte key, hex (default)
+keymaker 32
+
+# 64-byte key, base64
+keymaker 64 --format base64
+
+# 16-byte raw key saved to a file
+keymaker 16 --format raw --out secret.key
+
+# 32-byte uppercase hex key
+keymaker 32 --uppercase
+</code></pre>
+
+<h2>Platform Notes</h2>
+<ul>
+    <li><strong>Unix/macOS</strong>: Uses <code>/dev/urandom</code></li>
+    <li><strong>Windows</strong>: Uses <code>BCryptGenRandom</code> (no additional libraries required)</li>
+</ul>
+
+<h2>License</h2>
+<p>
+This project is released under the MIT License. You are free to use, modify, and distribute it.
+</p>
+
+</body>
+</html>

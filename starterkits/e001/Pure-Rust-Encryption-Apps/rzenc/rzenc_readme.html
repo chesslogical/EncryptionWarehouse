@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>rzenc — No‑deps Rust file encryption CLI</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #60a5fa;
+      --good: #34d399;
+      --warn: #f59e0b;
+      --bad: #f87171;
+      --code-bg: #0b1020;
+      --border: #1f2937;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    header {
+      background: linear-gradient(90deg, #1f2937 0%, #111827 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 32px 20px;
+    }
+    header h1 { margin: 0 0 6px; font-size: 28px; }
+    header p { margin: 0; color: var(--muted); }
+    main { max-width: 980px; margin: 0 auto; padding: 24px 20px 60px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+    section { margin: 28px 0; padding: 16px 18px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; }
+    h2 { margin-top: 0; font-size: 20px; }
+    h3 { font-size: 16px; margin-bottom: 6px; color: var(--muted); }
+    ul { margin: 8px 0 0 22px; }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 10px 0 0 0;
+    }
+    .tag { display: inline-block; padding: 3px 8px; border: 1px solid var(--border); border-radius: 999px; color: var(--muted); font-size: 12px; margin-right: 6px; }
+    .ok { color: var(--good); }
+    .warn { color: var(--warn); }
+    .bad { color: var(--bad); }
+    .kbd { display: inline-block; padding: 2px 6px; border: 1px solid var(--border); border-radius: 6px; background: #0b1224; font-family: ui-monospace, monospace; font-size: 13px; }
+    .callout { border-left: 4px solid var(--warn); background: #0b1224; padding: 10px 12px; border-radius: 8px; }
+    .muted { color: var(--muted); }
+    nav { margin-top: 8px; }
+    nav a { margin-right: 14px; font-size: 14px; color: var(--muted); }
+    .kv { display: grid; grid-template-columns: 190px 1fr; gap: 6px 12px; }
+    .kv div:nth-child(odd) { color: var(--muted); }
+    footer { color: var(--muted); text-align: center; margin-top: 28px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>rzenc <span class="tag">no-deps</span> <span class="tag">Rust</span> <span class="tag">Windows &amp; Linux</span></h1>
+  <p>Simple, careful file encryption CLI that replaces the target file atomically. Uses ChaCha20 + HMAC‑SHA‑256 with PBKDF2 (no external crates).</p>
+  <nav>
+    <a href="#quickstart">Quickstart</a>
+    <a href="#features">Features</a>
+    <a href="#safety">Safety &amp; limits</a>
+    <a href="#format">On‑disk format</a>
+    <a href="#algos">Algorithms</a>
+    <a href="#platform">Platform notes</a>
+    <a href="#troubleshooting">Troubleshooting</a>
+  </nav>
+</header>
+
+<main>
+
+<section id="quickstart">
+  <h2>Quickstart</h2>
+  <div class="grid">
+    <div>
+      <h3>Build</h3>
+      <pre><code># rustc 1.70+ recommended (stable)
+rustc -O rzenc.rs</code></pre>
+      <p class="muted">No third‑party crates required; standard library + a few FFI calls only.</p>
+    </div>
+    <div>
+      <h3>Encrypt</h3>
+      <pre><code># recommended: set the passphrase via env var
+set RZENC_PASS=correct horse battery staple   # Windows (cmd)
+# export RZENC_PASS='correct horse battery staple'       # Linux/macOS
+
+rzenc E a.txt   # replaces a.txt atomically with an encrypted version</code></pre>
+    </div>
+    <div>
+      <h3>Decrypt</h3>
+      <pre><code>rzenc D a.txt   # verifies tag, then replaces a.txt with plaintext</code></pre>
+      <p class="muted">If <code>RZENC_PASS</code> is not set, the tool reads the passphrase from stdin (echoed).</p>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <h2>Features at a glance</h2>
+  <ul>
+    <li><b>Encrypt‑then‑MAC</b>: ChaCha20 stream cipher + HMAC‑SHA‑256 for integrity.</li>
+    <li><b>Password‑based keys</b>: PBKDF2‑HMAC‑SHA‑256 with per‑file 16‑byte salt and <code>600,000</code> iterations.</li>
+    <li><b>Data safety first</b>: streams to a temp file, fsyncs, closes handles, then <b>atomically replaces</b> the original (<span class="ok">Windows: ReplaceFileW</span>, <span class="ok">Unix: rename</span>).</li>
+    <li><b>Verify before decrypt</b>: the MAC is checked before any plaintext is written; wrong passwords never corrupt your file.</li>
+    <li><b>No dependencies</b>: uses OS CSPRNG (Windows <code>RtlGenRandom</code>, Unix <code>/dev/urandom</code>).</li>
+  </ul>
+</section>
+
+<section id="safety">
+  <h2>Safety model &amp; limitations</h2>
+  <div class="callout">
+    <p><b>⚠️ Important:</b> Hand‑rolled crypto is risky compared to audited libraries. This project is for environments where dependencies are impossible. For high‑stakes data, prefer audited crates like <code>chacha20poly1305</code>, <code>argon2</code>, and <code>getrandom</code>.</p>
+  </div>
+  <ul>
+    <li><b>Atomic replacement, not byte‑in‑place:</b> avoids corruption on crash; you still invoke it as <code>E &lt;file&gt;</code>/<code>D &lt;file&gt;</code> and the same path is replaced.</li>
+    <li><b>Authentication first:</b> decryption refuses to write if the tag fails (bad password/tamper).</li>
+    <li><b>No secure wipe:</b> replacing a file does not erase old sectors; journaled filesystems or SSDs may retain copies.</li>
+    <li><b>Password input:</b> stdin is echoed to remain no‑deps/portable. Use <span class="kbd">RZENC_PASS</span> or patch in a no‑echo prompt via OS FFI if required.</li>
+    <li><b>Memory wiping is best‑effort:</b> key material is scrubbed with volatile writes, but full OS/optimizer guarantees are not absolute.</li>
+    <li><b>Compatibility:</b> File format is versioned via MAGIC <code>"RZENC001"</code>. Future versions may evolve.</li>
+  </ul>
+</section>
+
+<section id="format">
+  <h2>On‑disk format</h2>
+  <div class="kv">
+    <div>Magic</div><div><code>52 5A 45 4E 43 30 30 31</code> (<code>"RZENC001"</code>)</div>
+    <div>Alg</div><div><code>01</code> = ChaCha20 + HMAC‑SHA‑256</div>
+    <div>PBKDF2 iterations</div><div><code>u32</code> little‑endian (default <code>600,000</code>)</div>
+    <div>Salt</div><div>16 bytes</div>
+    <div>Nonce</div><div>12 bytes</div>
+    <div>Reserved</div><div>3 bytes zeros (alignment)</div>
+    <div>Ciphertext</div><div>same length as plaintext (stream cipher)</div>
+    <div>Tag</div><div>32 bytes HMAC‑SHA‑256 over <code>header || ciphertext</code></div>
+  </div>
+  <pre><code>layout:
+[ MAGIC(8) | ALG(1) | ITER(4) | SALT(16) | NONCE(12) | RESERVED(3) ]  // 44 bytes header
+[ CIPHERTEXT ... ]
+[ TAG(32) ]</code></pre>
+</section>
+
+<section id="algos">
+  <h2>Algorithms &amp; parameters</h2>
+  <ul>
+    <li><b>Key derivation:</b> PBKDF2‑HMAC‑SHA‑256(password, salt, iterations=600,000) → 64 bytes.
+      <ul>
+        <li>First 32 bytes → ChaCha20 key.</li>
+        <li>Next 32 bytes → HMAC‑SHA‑256 key.</li>
+      </ul>
+    </li>
+    <li><b>Nonce:</b> 12 random bytes; ChaCha20 block counter starts at <code>1</code>.</li>
+    <li><b>MAC:</b> HMAC‑SHA‑256(header || ciphertext); verified before decrypting.</li>
+    <li><b>Randomness:</b> Windows <code>RtlGenRandom</code> via FFI; Unix reads <code>/dev/urandom</code>.</li>
+  </ul>
+</section>
+
+<section id="platform">
+  <h2>Platform notes</h2>
+  <ul>
+    <li><b>Windows:</b> Atomic replacement uses <code>ReplaceFileW</code> with write‑through. Handles are closed before replacement. Linkage to <code>advapi32</code> (RNG) and <code>kernel32</code> is declared in the source.</li>
+    <li><b>Linux/Unix:</b> After <code>rename()</code>, the parent directory is <code>fsync</code>ed (best‑effort) to harden against power loss.</li>
+    <li><b>Large files:</b> Processed in 1 MiB chunks; only modest RAM usage.</li>
+  </ul>
+</section>
+
+<section id="usage">
+  <h2>Command‑line usage</h2>
+  <pre><code>Usage: rzenc [E|D] &lt;file&gt;
+
+Environment:
+  RZENC_PASS   passphrase (recommended way)
+
+Examples:
+  # Encrypt
+  set RZENC_PASS=top secret              &amp;&amp; rzenc E a.txt      # Windows (cmd)
+  # export RZENC_PASS='top secret'       &amp;&amp; rzenc E a.txt      # Linux/macOS
+
+  # Decrypt
+  set RZENC_PASS=top secret              &amp;&amp; rzenc D a.txt
+
+  # Verify integrity behavior
+  copy a.txt a.enc.bak     # or cp a.txt a.enc.bak
+  rzenc E a.txt
+  # flip a byte in the encrypted file, then:
+  rzenc D a.txt            # -> "authentication failed" and original is left untouched</code></pre>
+  <p class="muted">Exit codes: <b>0</b> success, <b>1</b> runtime error, <b>2</b> usage error.</p>
+</section>
+
+<section id="troubleshooting">
+  <h2>Troubleshooting</h2>
+  <ul>
+    <li><b>Link errors on Windows:</b> ensure you’re using the MSVC or MinGW toolchain with standard Windows SDK libs; the source declares <code>#[link(name=&quot;advapi32&quot;)]</code> and <code>#[link(name=&quot;kernel32&quot;)]</code>.</li>
+    <li><b>&quot;Access is denied&quot; on replace:</b> make sure the target isn’t open in another program; the tool closes its own handles before replacing.</li>
+    <li><b>Slow PBKDF2:</b> 600k iterations is intentional. You can change <code>DEFAULT_PBKDF2_ITERS</code> in the source to trade speed vs. brute‑force cost.</li>
+    <li><b>Passphrase echo:</b> set <code>RZENC_PASS</code> to avoid echoed input; or add a no‑echo OS prompt if you’re comfortable extending the source.</li>
+  </ul>
+</section>
+
+<section id="hardening">
+  <h2>Hardening ideas (if you allow minimal deps)</h2>
+  <ul>
+    <li>Swap PBKDF2 for a memory‑hard KDF (<code>argon2</code> / <code>scrypt</code>).</li>
+    <li>Use an AEAD like <code>chacha20poly1305</code> to reduce moving parts.</li>
+    <li>No‑echo password input (<code>rpassword</code>), and portable RNG (<code>getrandom</code>).</li>
+  </ul>
+</section>
+
+<footer>
+  <p>© You. This project is provided as‑is, without warranty. Review before protecting valuable data.</p>
+</footer>
+
+</main>
+</body>
+</html>
