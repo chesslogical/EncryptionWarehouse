@@ -7,3 +7,5 @@
 4-  Serpent-256 encryption
 
 5- threefish 1024
+
+byteconv  turn executables into readable txt files and vise versa.
