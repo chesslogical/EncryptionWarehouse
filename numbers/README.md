@@ -8,4 +8,6 @@
 
 5- threefish 1024
 
+key32 turn binary keys to text 
+
 byteconv  turn executables into readable txt files and vise versa.
